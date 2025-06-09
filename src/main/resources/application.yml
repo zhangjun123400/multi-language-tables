@@ -1,0 +1,41 @@
+spring:
+  application:
+    name: excel
+  datasource:
+    url: jdbc:mysql://localhost:3306/multi-language-tables?useUnicode=true&characterEncoding=utf-8&serverTimezone=Asia/Shanghai
+    username: root
+    password: root@123
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  mvc:
+    path match:
+      matching-strategy: ant_path_matcher
+  servlet:
+    multipart:
+      enabled: true # 启用文件上传
+      max-file-size: 10MB # 单个文件最大大小（示例10MB）
+      max-request-size: 100MB # 整个请求最大大小（示例100MB）
+      file-size-threshold: 0  # 文件写入磁盘阈值（0表示立即写入）
+      location: /tmp/upload # 临时存储路径
+
+mybatis-plus:
+  global-config:
+    db-config:
+      logic-delete-field: deleted
+      logic-delete-value: 1
+      logic-not-delete-value: 0
+  configuration:
+    map-underscore-to-camel-case: true
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+  type-aliases-package: com.zhangjun.excel.mbg.model
+
+server:
+  port: 8090
+
+
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+  api-docs:
+    path: /v3/api-docs
+
+
