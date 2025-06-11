@@ -1,6 +1,7 @@
 package com.zhangjun.excel.controller;
 
 import com.zhangjun.excel.common.api.CommonResult;
+import com.zhangjun.excel.mbg.model.SupplementTable;
 import com.zhangjun.excel.service.impl.EasyExcelExportService;
 import com.zhangjun.excel.service.impl.EasyExcelInputService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -16,6 +17,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 
 import java.io.IOException;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -62,9 +64,18 @@ public class EasyExcelController {
             //通过字符串处理分离文件名和扩展名
             String fileName = originalName.substring(0, originalName.lastIndexOf("."));
 
-            String newFileName = fileName+"zhangjun";
+            //新模版表格
+            String newFileName = fileName+"新模版"+new Date().getTime();
 
             easyExcelExportService.exportMultipleSheets(response,newFileName,dataMap);
+
+            response.reset();
+
+            //缺失待补充表格
+            String supplementTableFileName = "缺失翻译待补充表-"+new Date().getTime();
+            List<SupplementTable> supplementTableList = easyExcelInputService.supplementTable(dataMap);
+            easyExcelExportService.exportSupplementTable(response,supplementTableFileName,supplementTableList);
+
             return CommonResult.success("表格更新成功，文件已开始下载");
         } catch (IOException e) {
             log.error("Excel更新失败", e);

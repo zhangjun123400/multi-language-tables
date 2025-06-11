@@ -9,6 +9,7 @@ import com.zhangjun.excel.processor.SheetProcessor;
 import org.apache.poi.ss.formula.functions.T;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.lang.reflect.Field;
 import java.util.List;
 
 /**
@@ -32,7 +33,45 @@ public class NetworkGuideProcessor  implements SheetProcessor<NetworkConfigurati
                 existing.setConfigurationName(item.getConfigurationName());
                 ExcelExportUtil.safeCopyProperties(existing, item);
             }
+            /**
+            Field[] fields = item.getClass().getDeclaredFields();
+            for (Field field : fields) {
+                field.setAccessible(true);  // 允许访问私有属性
+                String name = field.getName();
+                try {
+                    Object value = field.get(item);//获取属性值
+
+                    if (value != null) {
+                        if(item.getConfigurationName().contains("引导标题"))
+                        {
+                            if (value.toString().length()>80)
+                            {
+
+                                System.out.println("===========");
+                                System.out.println(name + ": " + value);
+                                System.out.println("===========");
+                            }
+                        }else {
+                            if (value.toString().length()>250)
+                            {
+                                value=value.toString().substring(0,200);
+                                System.out.println("===========");
+                                System.out.println(name + ": " + value);
+                                System.out.println("===========");
+                            }
+                        }
+
+                    }
+
+
+
+                } catch (IllegalAccessException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+             */
         }
+
         return list;
     }
 }

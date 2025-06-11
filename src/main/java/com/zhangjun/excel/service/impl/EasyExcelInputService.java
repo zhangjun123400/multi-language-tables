@@ -3,6 +3,7 @@ package com.zhangjun.excel.service.impl;
 import com.alibaba.excel.EasyExcel;
 import com.alibaba.excel.ExcelReader;
 import com.alibaba.excel.read.metadata.ReadSheet;
+import com.zhangjun.excel.common.util.ExcelExportUtil;
 import com.zhangjun.excel.listener.*;
 import com.zhangjun.excel.mbg.mapper.*;
 import com.zhangjun.excel.mbg.model.*;
@@ -15,6 +16,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.reflect.Field;
 import java.util.*;
 
 /**
@@ -103,6 +105,61 @@ public class EasyExcelInputService {
             }
             return resultMap;
         }
+    }
+
+
+    /**
+     *
+     * @param dataMap
+     * @return
+     * @throws IOException
+     */
+    public List<SupplementTable> supplementTable(Map<String, List<?>> dataMap) throws IOException {
+        Map<String, List<?>> result = new HashMap<>(dataMap);
+        List<SupplementTable> supplementTableList = new ArrayList<>();
+
+        for(Map.Entry<String, List<?>> entry : result.entrySet()) {
+            SupplementTable supplementTable = new SupplementTable();
+            switch (entry.getKey()) {
+                case "基础配置":{
+                    List<BaseConfigurations> baseConfigurationsList = (List<BaseConfigurations>)entry.getValue();
+                    for (BaseConfigurations item : baseConfigurationsList) {
+                        ExcelExportUtil.safeCopyProperties1(item,supplementTable);
+                    }
+                }break;
+                case "配网引导":{
+                    List<NetworkConfigurationGuide> networkConfigurationGuideList = (List<NetworkConfigurationGuide>)entry.getValue();
+                    for (NetworkConfigurationGuide item : networkConfigurationGuideList) {
+                        ExcelExportUtil.safeCopyProperties1(item,supplementTable);
+                    }
+                } break;
+                case "功能定义":{
+                    List<FunctionDefinition> functionDefinitionList = (List<FunctionDefinition>)entry.getValue();
+                    for (FunctionDefinition item : functionDefinitionList) {
+                        ExcelExportUtil.safeCopyProperties1(item,supplementTable);
+                    }
+
+                }break;
+                case "消息推送":{
+                    List<MessagePush> messagePushList = (List<MessagePush>)entry.getValue();
+                    for (MessagePush item : messagePushList) {
+                        ExcelExportUtil.safeCopyProperties1(item,supplementTable);
+                    }
+
+                } break;
+                case "自动化":{
+                    List<Automation> automationList = (List<Automation>)entry.getValue();
+                    for (Automation item : automationList) {
+                        ExcelExportUtil.safeCopyProperties1(item,supplementTable);
+                    }
+
+                } break;
+            }
+            supplementTableList.add(supplementTable);
+
+        }
+        return supplementTableList;
+
     }
 
     // 创建处理器映射
