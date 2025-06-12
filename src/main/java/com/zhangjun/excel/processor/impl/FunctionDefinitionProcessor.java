@@ -26,11 +26,12 @@ public class FunctionDefinitionProcessor implements SheetProcessor<FunctionDefin
             queryWrapper.eq(FunctionDefinition::getConfigurationName,  item.getConfigurationName())
                     .eq(FunctionDefinition::getSimplifiedChinese,item.getSimplifiedChinese());
 
-            FunctionDefinition existing = baseMapper.selectOne(queryWrapper);
-            if (existing != null) {
-                existing.setConfigurationId(item.getConfigurationId());
-                existing.setConfigurationName(item.getConfigurationName());
-                ExcelExportUtil.safeCopyProperties(existing, item);
+            List<FunctionDefinition> existing = baseMapper.selectList(queryWrapper);
+            if (!existing.isEmpty()) {
+                FunctionDefinition functionDefinition = existing.get(0);
+                functionDefinition.setConfigurationId(item.getConfigurationId());
+                functionDefinition.setConfigurationName(item.getConfigurationName());
+                ExcelExportUtil.safeCopyProperties(functionDefinition, item);
             }
         }
         return list;

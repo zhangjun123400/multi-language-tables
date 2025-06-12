@@ -13,6 +13,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.util.List;
 import java.util.Map;
+import java.util.zip.ZipOutputStream;
 
 /**
  * @Author zhangjun
@@ -29,10 +30,10 @@ public class EasyExcelExportService {
      * @param fileName
      * @param dataMap
      */
-    public void exportMultipleSheets(HttpServletResponse response,String fileName, Map<String, List<?>> dataMap) {
+    public void exportMultipleSheets(String file, Map<String, List<?>> dataMap) {
 
         try {
-            ExcelExportUtil.exportMultiSheet(response, fileName, dataMap);
+            ExcelExportUtil.exportMultiSheet(file, dataMap);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -45,10 +46,10 @@ public class EasyExcelExportService {
      * @param fileName
      * @param supplementTables
      */
-    public void exportSupplementTable(HttpServletResponse response,String fileName, List<SupplementTable> supplementTables) {
+    public void exportSupplementTable(String file, List<SupplementTable> supplementTables) {
 
         try {
-            ExcelExportUtil.exportSupplementTable(response, fileName, supplementTables);
+            ExcelExportUtil.exportSupplementTable(file, supplementTables);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

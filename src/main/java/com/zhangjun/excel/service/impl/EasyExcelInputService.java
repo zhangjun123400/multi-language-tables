@@ -114,8 +114,9 @@ public class EasyExcelInputService {
      * @return
      * @throws IOException
      */
-    public List<SupplementTable> supplementTable(Map<String, List<?>> dataMap) throws IOException {
+    public List<SupplementTable> supplementTable(Map<String, List<?>> dataMap) throws IOException, InstantiationException, IllegalAccessException {
         Map<String, List<?>> result = new HashMap<>(dataMap);
+
         List<SupplementTable> supplementTableList = new ArrayList<>();
 
         for(Map.Entry<String, List<?>> entry : result.entrySet()) {
@@ -124,33 +125,36 @@ public class EasyExcelInputService {
                 case "基础配置":{
                     List<BaseConfigurations> baseConfigurationsList = (List<BaseConfigurations>)entry.getValue();
                     for (BaseConfigurations item : baseConfigurationsList) {
-                        ExcelExportUtil.safeCopyProperties1(item,supplementTable);
+                        ExcelExportUtil.copyNonNullAsNA(item,supplementTable);
+                        System.out.println("==============");
+                        System.out.println(supplementTable.toString());
+                        System.out.println("==============");
                     }
                 }break;
                 case "配网引导":{
                     List<NetworkConfigurationGuide> networkConfigurationGuideList = (List<NetworkConfigurationGuide>)entry.getValue();
                     for (NetworkConfigurationGuide item : networkConfigurationGuideList) {
-                        ExcelExportUtil.safeCopyProperties1(item,supplementTable);
+                        ExcelExportUtil.copyNonNullAsNA(item,supplementTable);
                     }
                 } break;
                 case "功能定义":{
                     List<FunctionDefinition> functionDefinitionList = (List<FunctionDefinition>)entry.getValue();
                     for (FunctionDefinition item : functionDefinitionList) {
-                        ExcelExportUtil.safeCopyProperties1(item,supplementTable);
+                        ExcelExportUtil.copyNonNullAsNA(item,supplementTable);
                     }
 
                 }break;
                 case "消息推送":{
                     List<MessagePush> messagePushList = (List<MessagePush>)entry.getValue();
                     for (MessagePush item : messagePushList) {
-                        ExcelExportUtil.safeCopyProperties1(item,supplementTable);
+                        ExcelExportUtil.copyNonNullAsNA(item,supplementTable);
                     }
 
                 } break;
                 case "自动化":{
                     List<Automation> automationList = (List<Automation>)entry.getValue();
                     for (Automation item : automationList) {
-                        ExcelExportUtil.safeCopyProperties1(item,supplementTable);
+                        ExcelExportUtil.copyNonNullAsNA(item,supplementTable);
                     }
 
                 } break;

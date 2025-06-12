@@ -2,7 +2,9 @@ package com.zhangjun.excel.common.util;
 
 import com.alibaba.excel.EasyExcel;
 import com.alibaba.excel.ExcelWriter;
+import com.alibaba.excel.support.ExcelTypeEnum;
 import com.alibaba.excel.write.metadata.WriteSheet;
+import com.alibaba.excel.write.metadata.WriteWorkbook;
 import com.alibaba.excel.write.style.column.LongestMatchColumnWidthStyleStrategy;
 import com.zhangjun.excel.mbg.model.SupplementTable;
 import jakarta.servlet.http.HttpServletResponse;
@@ -10,12 +12,13 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.io.OutputStream;
 import java.lang.reflect.Field;
-import java.net.URLEncoder;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.zip.ZipOutputStream;
 
 /**
  * @Author zhangjun
@@ -23,24 +26,35 @@ import java.util.Map;
  * @Version 1.0
  */
 public class ExcelExportUtil {
-    public static void exportMultiSheet(HttpServletResponse response,
-                                        String fileName, Map<String, List<?>> sheetDataMap) throws IOException {
 
-        response.setContentType("application/vnd.ms-excel");
-        response.setHeader("Content-Disposition",
-                "attachment;filename=" + URLEncoder.encode(fileName, "UTF-8") + ".xlsx");
+    /**
+     * 导出复杂表格
+     *
+     * @param file
+     * @param sheetDataMap
+     * @throws IOException
+     */
+    public static void exportMultiSheet(String file, Map<String, List<?>> sheetDataMap) throws IOException {
 
-        try (ExcelWriter excelWriter = EasyExcel.write(response.getOutputStream()).build()) {
+        ExcelWriter excelWriter = EasyExcel.write(file).build();
+        try {
             sheetDataMap.forEach((sheetName, dataList) -> {
-                WriteSheet writeSheet = EasyExcel.writerSheet(sheetName)
-                        .head(dataList.get(0).getClass()).build();
-                excelWriter.write(dataList, writeSheet);
+                if (!dataList.isEmpty()) {
+                    WriteSheet writeSheet = EasyExcel.writerSheet(sheetName)
+                            .head(dataList.get(0).getClass()).build();
+                    excelWriter.write(dataList, writeSheet);
+                }
             });
+        } finally {
+            if (excelWriter != null) {
+                excelWriter.finish();
+            }
         }
+
     }
 
     // 通用读取方法
-    public static  <T> List<T> readSheet(MultipartFile file, String sheetName, Class<T> clazz) {
+    public static <T> List<T> readSheet(MultipartFile file, String sheetName, Class<T> clazz) {
         try {
             return EasyExcel.read(file.getInputStream())
                     .head(clazz)
@@ -52,26 +66,31 @@ public class ExcelExportUtil {
     }
 
     /**
-     *导出简单表格
-     * @param response
-     * @param fileName
+     * 导出简单表格
+     *
+     * @param file
      * @param supplementTables
      * @throws IOException
      */
-    public static void exportSupplementTable(HttpServletResponse response,
-                                      String fileName,List<SupplementTable> supplementTables) throws IOException{
-        response.setContentType("application/vnd.ms-excel");
-        response.setHeader("Content-Disposition",
-                "attachment;filename=" + URLEncoder.encode(fileName, "UTF-8") + ".xlsx");
+    public static void exportSupplementTable(String file, List<SupplementTable> supplementTables)
+            throws IOException {
 
-        EasyExcel.write(response.getOutputStream(), SupplementTable.class)
-                .registerWriteHandler(new LongestMatchColumnWidthStyleStrategy())  // 自动调整列宽
-                .sheet("1")
-                .doWrite(supplementTables);
+        ExcelWriter writer = null;
+        try {
+            writer = EasyExcel.write(file, SupplementTable.class)
+                    .registerWriteHandler(new LongestMatchColumnWidthStyleStrategy())
+                    .build();
+            writer.write(supplementTables, EasyExcel.writerSheet("Sheet1").build());
+        } finally {
+            if (writer != null) {
+                writer.finish();
+            }
+        }
     }
 
     /**
      * 属性复制，但是空属性不复制
+     *
      * @param src
      * @param target
      */
@@ -87,31 +106,42 @@ public class ExcelExportUtil {
                             }
                         })
                         .map(Field::getName)
-                        .toArray(String[]::new)
-        );
+                        .toArray(String[]::new));
     }
 
     /**
-     *属性复制，但是非空属性全部改为“NA”
+     * 属性复制，但是非空属性全部改为“NA”
+     *
      * @param src
      * @param target
      */
-    public static void safeCopyProperties1(Object src, Object target) {
-        BeanUtils.copyProperties(src, target,
-                Arrays.stream(src.getClass().getDeclaredFields())
-                        .filter(field -> {
-                            try {
-                                field.setAccessible(true);
-                                if (field.get(src) != null) {
-                                    field.set(src,"NA");
-                                }
-                                return true;
-                            } catch (IllegalAccessException e) {
-                                return false;
-                            }
-                        })
-                        .map(Field::getName)
-                        .toArray(String[]::new)
-        );
+    public static void copyNonNullAsNA(Object src, Object target) throws InstantiationException, IllegalAccessException {
+        // 创建临时拷贝对象
+        Object temp = src.getClass().newInstance();
+        BeanUtils.copyProperties(src, temp);
+
+        // 处理临时对象的字段
+        Field[] fields = temp.getClass().getDeclaredFields();
+        Arrays.stream(fields).forEach(field -> {
+            try {
+                field.setAccessible(true);
+                Object value = field.get(temp);
+                if (value != null) {
+                    if (field.getType() == Integer.class) return;
+                    if ("simplifiedChinese".equals(field.getName())) return;
+                    if ("english".equals(field.getName())) return;
+
+                    field.set(temp, field.getType() == String.class
+                            ? "NA"
+                            : String.valueOf(value));
+                }
+            } catch (Exception ignored) {
+            }
+        });
+
+        // 将处理后的临时对象拷贝到target
+        BeanUtils.copyProperties(temp, target);
+
     }
+
 }

@@ -70,7 +70,7 @@ public class FunctionReadListener extends AnalysisEventListener<FunctionDefiniti
 
             LambdaQueryWrapper<FunctionDefinition> queryWrapper = new LambdaQueryWrapper<>();
             queryWrapper.eq(FunctionDefinition::getConfigurationName,item.getConfigurationName())
-                    .eq(FunctionDefinition::getSimplifiedChinese,item.getSimplifiedChinese());
+                    .eq(FunctionDefinition::getConfigurationId,item.getConfigurationId());
             FunctionDefinition existing =functionDefinitionMapper.selectOne(queryWrapper);
             if (existing != null) {
                 ExcelExportUtil.safeCopyProperties(item,existing);
