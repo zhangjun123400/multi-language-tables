@@ -19,6 +19,10 @@ public class SupplementTable implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
+    @Schema(description = "Sheet页")
+    @ExcelProperty("Sheet页")
+    private String sheetName;
+
     @Schema(description = "简体中文")
     @ExcelProperty("简体中文")
     private String simplifiedChinese;

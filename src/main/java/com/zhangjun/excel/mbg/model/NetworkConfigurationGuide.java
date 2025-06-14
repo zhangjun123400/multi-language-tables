@@ -10,6 +10,7 @@ import java.io.Serializable;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.Column;
 import jakarta.validation.constraints.Size;
+import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 import com.alibaba.excel.annotation.ExcelProperty;
@@ -24,8 +25,7 @@ import com.alibaba.excel.annotation.ExcelIgnore;
  * @author zhangjun
  * @since 2025-06-07
  */
-@Getter
-@Setter
+@Data
 @TableName("network_configuration_guide")
 @Schema(name = "NetworkConfigurationGuide", description = "配网引导")
 public class NetworkConfigurationGuide implements Serializable {

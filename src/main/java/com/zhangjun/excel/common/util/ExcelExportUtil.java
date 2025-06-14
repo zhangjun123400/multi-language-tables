@@ -2,23 +2,17 @@ package com.zhangjun.excel.common.util;
 
 import com.alibaba.excel.EasyExcel;
 import com.alibaba.excel.ExcelWriter;
-import com.alibaba.excel.support.ExcelTypeEnum;
 import com.alibaba.excel.write.metadata.WriteSheet;
-import com.alibaba.excel.write.metadata.WriteWorkbook;
 import com.alibaba.excel.write.style.column.LongestMatchColumnWidthStyleStrategy;
 import com.zhangjun.excel.mbg.model.SupplementTable;
-import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.BeanUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.lang.reflect.Field;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
-import java.util.zip.ZipOutputStream;
 
 /**
  * @Author zhangjun
@@ -143,5 +137,27 @@ public class ExcelExportUtil {
         BeanUtils.copyProperties(temp, target);
 
     }
+
+
+    /**
+     * 判断一个实体类属性为Integer和String类型的，所有属性值是否全不为空
+     * @param obj
+     * @return
+     */
+    public static boolean isAllFieldsNotNull(Object obj) {
+        Field[] fields = obj.getClass().getDeclaredFields();
+        for (Field field : fields) {
+            field.setAccessible(true); // 允许访问私有字段
+            try {
+                Object value = field.get(obj);
+                if (field.getType() == int.class || field.getType() == Integer.class) continue;
+                if (value == null) return false; // 检查null
+            } catch (IllegalAccessException e) {
+                e.printStackTrace();
+            }
+        }
+        return true;
+    }
+
 
 }

@@ -26,8 +26,7 @@ public class EasyExcelExportService {
 
     /**
      * 导出新学习到的模版
-     * @param response
-     * @param fileName
+     * @param file
      * @param dataMap
      */
     public void exportMultipleSheets(String file, Map<String, List<?>> dataMap) {
@@ -42,8 +41,7 @@ public class EasyExcelExportService {
 
     /**
      * 导出缺失表
-     * @param response
-     * @param fileName
+     * @param file
      * @param supplementTables
      */
     public void exportSupplementTable(String file, List<SupplementTable> supplementTables) {
